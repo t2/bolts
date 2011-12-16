@@ -8,7 +8,7 @@ class Bolts < Thor::Group
   def install
     dir_path = [".", "/#{group}"].join
     Find.find(dir_path) do |bolt|
-    	if File.file?(bolt) && File.extname(bolt).eql?(".thor")
+    	if File.extname(bolt).eql?(".thor")
         thor :install, bolt, :force => true
       end
     end
