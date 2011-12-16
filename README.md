@@ -7,11 +7,11 @@ Bolts is a collection of [thor](https://github.com/wycats/thor/wiki) tasks I hav
 
 Installation
 ------------
-Install [thor](https://github.com/wycats/thor)
-Clone the bolts repo
-    git clone git@github.com:t2/bolts.git
-    cd bolts
-    thor install *task name*
+ Install [thor](https://github.com/wycats/thor) then:
+
+	git clone git@github.com:t2/bolts.git
+	cd bolts
+	thor install *task name*
 
 License
 -------
