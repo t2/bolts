@@ -10,11 +10,9 @@ hamlr: Convert all of a Rails app's erb views to haml. (thor help hamlr:hamltime
 
 Installation
 ------------
- Install [thor](https://github.com/wycats/thor) then:
-
-	git clone git@github.com:t2/bolts.git
-	cd bolts
-	thor install *task name*
+* `gem install thor`
+* `thor install bolts.thor`
+* `thor bolts GROUP` - leave group blank to install all bolts.
 
 License
 -------
