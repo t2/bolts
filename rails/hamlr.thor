@@ -1,4 +1,5 @@
 require 'find'
+require 'open3'
 require 'rubygems'
 begin
   require 'haml'
@@ -12,19 +13,21 @@ MESSAGE
   exit 1
 end
 
-class Hamlr < Thor
-  desc "hamltime", "convert all html/erb views in your project to haml"
-  method_options :delete => true, :aliases => "-d", :desc => "Delete the original erb file."
-  def hamltime
+class Hamlr < Thor::Group
+  include Thor::Actions
+
+  argument :delete, :default => true, :desc => "Delete the original erb files?"
+  desc "convert all html/erb views in your project to haml"
+
+  def convert
     branch_project
 
-    Find.find(Dir.pwd) do |f|
-      if File.file?(f) && File.extname(f).eql?(".erb")
-        haml = Haml::Exec::HTML2Haml.new(["-r", "#{f}", "#{f.gsub(/\.erb$/, '.haml')}"])
-        haml.parse
-
+    Find.find(destination_root) do |f|
+      if File.extname(f).eql?(".erb")
         begin
-          File.delete(f) if options[:delete]
+          haml = Haml::Exec::HTML2Haml.new(["-r", "#{f}", "#{f.gsub(/\.erb$/, '.haml')}"])
+          haml.parse
+          remove_file(f) if delete
         rescue Exception => e
           puts e.message
         end
@@ -34,15 +37,15 @@ class Hamlr < Thor
   end
 
 private
-  def project_is_configured_for_git?
+  def using_git?
     File.directory? '.git'
   end
   
   def branch_project
-    if project_is_configured_for_git?
+    if using_git?
       begin
-        # use -d instead of -D so not to remove uncommitted changes
-        `git branch -d hamlr`
+        `git checkout master`
+        `git branch -D hamlr` if File.file?("#{destination_root}/.git/refs/heads/hamlr")
         `git checkout -b hamlr`
       rescue Exception => e
         puts "Oh snap! Error: #{e.message}"
