@@ -14,14 +14,14 @@ end
 
 class Hamlr < Thor
   desc "hamltime", "convert all html/erb views in your project to haml"
-  method_option :delete => true, :aliases => "-d", :desc => "Delete the original erb file"
+  method_option :delete => true, :aliases => "-d", :desc => "Delete the original erb file."
   def hamltime
     branch_project
 
     #
     # traverse project tree and convert erb files to haml.
     # 
-    Find.find(File.dirname(__FILE__)) do |f|
+    Find.find(Dir.pwd) do |f|
       if File.file?(f) && File.extname(f).eql?(".erb")
         haml = Haml::Exec::HTML2Haml.new(["-r", "#{f}", "#{f.gsub(/\.erb$/, '.haml')}"])
         haml.parse
