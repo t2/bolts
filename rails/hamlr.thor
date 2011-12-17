@@ -29,7 +29,7 @@ class Hamlr < Thor::Group
           haml.parse
           remove_file(f) if delete
         rescue Exception => e
-          puts e.message
+          puts "Oh snap! Error: #{e.message}"
         end
       end
     end
@@ -38,7 +38,7 @@ class Hamlr < Thor::Group
 
 private
   def using_git?
-    File.directory? '.git'
+    File.directory?('.git')
   end
   
   def branch_project
