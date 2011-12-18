@@ -1,5 +1,4 @@
 require 'find'
-require 'open3'
 require 'rubygems'
 begin
   require 'haml'
@@ -16,18 +15,24 @@ end
 class Hamlr < Thor::Group
   include Thor::Actions
 
-  argument :delete, :default => true, :desc => "Delete the original erb files?"
+  class_option :delete, :default => true, :aliases => "-d", :type => :boolean, :desc => "Delete the original erb files?"
+  class_option :html, :default => true, :aliases => "-h", :type => :boolean, :desc => "Convert HTML as well?"
+
   desc "convert all html/erb views in your project to haml"
 
   def convert
     branch_project
 
+    exts = [".erb", ".html"]
+    exts.delete(".html") unless options[:html]
+
     Find.find(destination_root) do |f|
-      if File.extname(f).eql?(".erb")
+      ext = File.extname(f)
+      if exts.include? ext
         begin
-          haml = Haml::Exec::HTML2Haml.new(["-r", "#{f}", "#{f.gsub(/\.erb$/, '.haml')}"])
+          haml = Haml::Exec::HTML2Haml.new(["-r", "#{f}", "#{f.gsub(/#{ext}$/, '.haml')}"])
           haml.parse
-          remove_file(f) if delete
+          remove_file(f) if options[:delete]
         rescue Exception => e
           puts "Oh snap! Error: #{e.message}"
         end
@@ -44,7 +49,6 @@ private
   def branch_project
     if using_git?
       begin
-        `git checkout master`
         `git branch -D hamlr` if File.file?("#{destination_root}/.git/refs/heads/hamlr")
         `git checkout -b hamlr`
       rescue Exception => e
